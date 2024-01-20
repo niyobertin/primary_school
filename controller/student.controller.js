@@ -1,5 +1,4 @@
 import studentsSchema from "../models/student.js"
-import express  from "express"
 //creating or posting a student.
 const createStudents = async(req,res) =>{
     const students = new studentsSchema({
@@ -13,7 +12,6 @@ const createStudents = async(req,res) =>{
     res.send(students);
 
 }
-
 //Getting student all students;
 const getStudent = async(req,res) =>{
     try{studentsSchema.find()
@@ -63,10 +61,20 @@ const getOne = async(req,res) => {
             res.send(error.message);
         }
     }
-
+    //Deleting a student
+    const removeStudent = async(req,res) =>{
+        try{
+            const _id = req.params.id;
+            await studentsSchema.deleteOne({_id});
+            res.send("Student deleted!");
+        }catch(error){
+            res.send(error.message);
+        }
+    }
 export default {
     createStudents,
     getStudent,
     getOne,
-    updateStudent
+    updateStudent,
+    removeStudent
 };
