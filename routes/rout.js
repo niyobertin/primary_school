@@ -1,10 +1,17 @@
 import  express  from "express";
 import studentController from "../controller/student.controller.js";
+import subjectController from "../controller/subject.controller.js";
 const router = express.Router();
-router.get("/",(req,res) =>res.send('testing the the hte ht klasjkdfhklajfo router'));
+//Students router
 router.post("/posts",studentController.createStudents);
 router.get("/gets",studentController.getStudent);
 router.get("/gets/:id",studentController.getOne);
 router.patch("/update/:id",studentController.updateStudent);
 router.delete("/delete/:id",studentController.removeStudent);
+//subject route
+router.post('/subject/posts',subjectController.createSubject);
+router.get('/subject/get',subjectController.getSubject);
+router.get('/subject/get/:id',subjectController.getUniqueSubject);
+router.patch('/subject/update/:id',subjectController.updateSubject);
+router.delete('/subject/delete/:id',subjectController.removeSubject);
 export default router;

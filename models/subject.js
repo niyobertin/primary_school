@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const subjectSchema = new mongoose.Schema({
     subject_name:{type:String,required:true,unique:true},
     marks:{
@@ -7,6 +6,5 @@ const subjectSchema = new mongoose.Schema({
         exame:{type:Number,default:0},
         total:{type:Number,default:0}
     }
-})
-
+});
 export default  mongoose.model("subject",subjectSchema);

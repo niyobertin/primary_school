@@ -1,25 +1,25 @@
 import studentsSchema from "../models/student.js"
 //creating or posting a student.
 const createStudents = async(req,res) =>{
-    const students = new studentsSchema({
+    studentsSchema.creatw({
         first_name:req.body.first_name,
         second_name:req.body.second_name,
         gender:req.body.gender,
         age:req.body.age,
         grade:req.body.grade
     });
-    await students.save();
-    res.send(students);
+    res.send("Stuedent added.");
 
 }
 //Getting student all students;
 const getStudent = async(req,res) =>{
-    try{studentsSchema.find()
-    .then((data) =>{
-            res.send(data);
+    try{
+        studentsSchema.find()
+    .then((students) =>{
+            res.send(students);
     }); 
     }catch(error){
-        console.log(error.message);
+        res.sendStatus(404);
     }
 }
 //Get a single students.
@@ -27,12 +27,12 @@ const getOne = async(req,res) => {
        try{
          const _id = req.params.id;
          await studentsSchema.findOne({_id})
-            .then(data =>{
-                res.send(data);
+            .then(st =>{
+                res.send(st);
             })
-
+//st stand for student.
     }catch(error){
-        res.status(404).send("404 Not Found");
+        res.sendStatus(404);
     }
     }
     //updating student 
@@ -68,7 +68,7 @@ const getOne = async(req,res) => {
             await studentsSchema.deleteOne({_id});
             res.send("Student deleted!");
         }catch(error){
-            res.send(error.message);
+            res.sendStatus(404);
         }
     }
 export default {
