@@ -1,16 +1,21 @@
 import subject from "../models/subject.js";
 import subjectSchema from "../models/subject.js";
 const createSubject = async(req,res) =>{
-    subjectSchema.create({
-    subject_name:req.body.subject_name,
-    marks:req.body.marks
-    })
     try{
-        await res.send('New subject added.');
-
-    }catch(error){
-        res.send(error.message);
-    }
+        let mid = req.body.cat;
+        let ex = req.body.exame;
+    await subjectSchema.create({
+    subject_name:req.body.subject_name,
+    cat:req.body.cat,
+    exame:req.body.exame,
+    total:mid + ex
+    })
+    .then((s) =>{
+        res.send(s)
+    });
+     }catch(error){
+           res.send(error.message);
+       }
 }
 //getting all subject 
 const getSubject = async(req,res) =>{
@@ -46,8 +51,13 @@ const updateSubject = async(req,res) =>{
             }
             // special case on marks 
             if(req.body.marks){
-                sub.marks = req.body.marks;
+               
+                sub.marks.cat = req.body.marks || sub.marks.cat;
+                sub.marks.exame = req.body.marks || sub.marks.exame;
+                console.log(sub.marks.exame);
+                // sub.marks = req.body.marks;
             }
+            
             sub.save();
             res.send(sub);
         })
@@ -65,10 +75,24 @@ const removeSubject = async(req,res) =>{
         res.sendStatus(404);
     }
 }
+//removing all
+
+const deleteAll = async(req,res)=>{
+    try{
+      await  subjectSchema.deleteMany()
+        .then(() =>{
+            res.send("Delecting all successifully")
+        })
+}catch(error){
+res.send(error.message);
+}
+   
+}
 export default {
     createSubject,
     getSubject,
     getUniqueSubject,
     updateSubject,
-    removeSubject
+    removeSubject,
+    deleteAll
 }

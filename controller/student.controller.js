@@ -71,10 +71,22 @@ const getOne = async(req,res) => {
             res.sendStatus(404);
         }
     }
+    //removing all
+const deleteAll = async(req,res)=>{
+    try{
+      await  subjectSchema.deleteMany()
+        .then(() =>{
+            res.send("Delecting all successifully")
+        })
+}catch(error){
+res.send(error.message);
+}   
+}
 export default {
     createStudents,
     getStudent,
     getOne,
     updateStudent,
-    removeStudent
+    removeStudent,
+    deleteAll
 };
