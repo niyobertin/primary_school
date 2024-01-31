@@ -1,17 +1,13 @@
-import mongoose from "mongoose";
-   const studentsSchema  = mongoose.Schema({
-        first_name:{
-            type:String,
-            required:true,
-            uppercase:true
-        },
-        second_name:String,
-        gender:{type:String,required:true},
-        age:{type:Number,required:true},
-        grade:{type:String,required:true},//this grade represent the class a student is in.
-        createdAt:{
-            type:Date,
-            default:Date.now
-        }
-    });
-    export default mongoose.model('student',studentsSchema);
+import  Sequelize  from "sequelize";
+import db from '../connection/connection.js';
+//Student model
+const StudentModel = db.define('Student',{
+    fname:{type:Sequelize.STRING,allowNull:false},
+    sname:{type:Sequelize.STRING},
+    gender:{type:Sequelize.STRING,allowNull:false},
+    age:{type:Sequelize.INTEGER,allowNull:false},
+    grade:{type:Sequelize.STRING,allowNull:false}
+})
+await StudentModel.sync();
+export default StudentModel;
+

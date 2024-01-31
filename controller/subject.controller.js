@@ -1,17 +1,15 @@
-import subject from "../models/subject.js";
-import subjectSchema from "../models/subject.js";
+import subjects from '../models/subject.js';
 const createSubject = async(req,res) =>{
+    const{subName,cat,exam} = req.body;
     try{
-        let mid = req.body.cat;
-        let ex = req.body.exame;
-    await subjectSchema.create({
-    subject_name:req.body.subject_name,
-    cat:req.body.cat,
-    exame:req.body.exame,
-    total:mid + ex
+    await subjects.create({
+    subName,
+    cat,
+    exam,
+    Total:cat + exam
     })
     .then((s) =>{
-        res.send(s)
+        res.send("Adding subject successfully ✅")
     });
      }catch(error){
            res.send(error.message);
@@ -19,7 +17,7 @@ const createSubject = async(req,res) =>{
 }
 //getting all subject 
 const getSubject = async(req,res) =>{
-   await subjectSchema.find()
+   await subjects.findAll()
     .then((subjects) =>{
       try{
             res.send(subjects);
@@ -31,36 +29,42 @@ const getSubject = async(req,res) =>{
 //Get single subject
 const getUniqueSubject = async(req,res) =>{
     try{
-    const _id = req.params.id;
-await subjectSchema.findById({_id})
+    const id = parseInt(req.params.id);
+await subjects.findByPk(id)
 .then((subject) =>{
-        res.send(subject);
+    if (subject) {
+        res.json(subject);
+    } else {
+        res.sendStatus(404);
+    }
 });
 }catch(error){
-    res.sendStatus(404);
+    res.send(error.message);
 }
 }
 //updating subject
 const updateSubject = async(req,res) =>{
     try{
-        const _id = req.params.id;
-     await   subjectSchema.findById({_id})
-        .then((sub) =>{
-            if(req.body.subject_name){
-                sub.subject_name = req.body.subject_name
+        const id = parseInt(req.params.id);
+        let {subName,cat,exam} = req.body;
+        await  subjects.findByPk(id)
+        .then((subject) =>{
+            if(exam === undefined){
+                exam = subject.exam;
             }
-            // special case on marks 
-            if(req.body.marks){
-               
-                sub.marks.cat = req.body.marks || sub.marks.cat;
-                sub.marks.exame = req.body.marks || sub.marks.exame;
-                console.log(sub.marks.exame);
-                // sub.marks = req.body.marks;
+            if(cat === undefined){
+                cat = subject.cat;
             }
-            
-            sub.save();
-            res.send(sub);
+          subject.update({
+            subName:subName || subject.subName,
+            cat:cat || subject.cat,
+            exam:exam || subject.exam,
+            Total: parseFloat(cat) + parseFloat(exam)
+          })
+          .then(() => res.send('Edit successifull'))
         })
+        .catch(err => res.send(err.message));
+        
     }catch(error){
         res.send(error.message);
     }
@@ -68,9 +72,16 @@ const updateSubject = async(req,res) =>{
 //deleting subject
 const removeSubject = async(req,res) =>{
     try{
-        const _id = req.params.id;
-        await subjectSchema.deleteOne({_id});
-        res.send("Subject deleted!");
+        const id = parseInt(req.params.id);
+        await  subjects.findByPk(id)
+          .then((subject) =>{
+              if(!subject){
+                  res.sendStatus(404);
+              }else{
+                  subject.destroy({restartIdentity: false})
+                  .then(() => res.send("Student deleted!"))
+              }
+          })
     }catch(error){
         res.sendStatus(404);
     }
@@ -79,7 +90,7 @@ const removeSubject = async(req,res) =>{
 
 const deleteAll = async(req,res)=>{
     try{
-      await  subjectSchema.deleteMany()
+        await  subjects.truncate({restartIdentity: true})
         .then(() =>{
             res.send("Delecting all successifully")
         })

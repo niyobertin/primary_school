@@ -1,22 +1,27 @@
-import studentsSchema from "../models/student.js"
+import students from '../models/student.js';
 //creating or posting a student.
 const createStudents = async(req,res) =>{
-    studentsSchema.creatw({
-        first_name:req.body.first_name,
-        second_name:req.body.second_name,
-        gender:req.body.gender,
-        age:req.body.age,
-        grade:req.body.grade
-    });
-    res.send("Stuedent added.");
-
+   const {fname,sname,gender,age,grade} = req.body;
+  await students.create({
+    fname,
+    sname,
+    gender,
+    age,
+    grade
+   })
+    .then(() => res.send("Adding student successfully ✅"))
+    .catch((err) =>res.send(err.message))
 }
 //Getting student all students;
 const getStudent = async(req,res) =>{
     try{
-        studentsSchema.find()
-    .then((students) =>{
-            res.send(students);
+        students.findAll()
+    .then((sts) =>{
+        if (sts) {
+            res.json(sts);
+        } else {
+            res.sendStatus(404);
+        }
     }); 
     }catch(error){
         res.sendStatus(404);
@@ -25,38 +30,40 @@ const getStudent = async(req,res) =>{
 //Get a single students.
 const getOne = async(req,res) => {
        try{
-         const _id = req.params.id;
-         await studentsSchema.findOne({_id})
+         const id = parseInt(req.params.id);
+         await students.findByPk(id)
             .then(st =>{
-                res.send(st);
+                if (st) {
+                    res.json(st);
+                } else {
+                    res.sendStatus(404);
+                }
             })
-//st stand for student.
+        //st stand for student.
     }catch(error){
-        res.sendStatus(404);
+        res.status(404);
     }
     }
     //updating student 
     const updateStudent = async(req,res) =>{
         try{
-            const _id = req.params.id;
-            const updatedStudent = await studentsSchema.findOne({_id});
-            if(req.body.first_name){
-                updatedStudent.first_name = req.body.first_name;
-            }
-            if(req.body.second_name){
-                updatedStudent.second_name = req.body.second_name
-            }
-            if(req.body.gender){
-                updatedStudent.gender = req.body.gender
-            }
-            if(req.body.age){
-                updatedStudent.age = req.body.age;
-            }
-            if(req.body.grade){
-                updatedStudent.grade = req.body.grade;
-            }
-            updatedStudent.save();
-            res.send("Update successifuly!")
+            const {fname,sname,gender,age,grade} = req.body;
+            const id = parseInt(req.params.id);
+            students.findByPk(id)
+            .then((st =>{
+                st.update({
+                    fname:fname || st.fname,
+                    sname:sname || st.sname,
+                    gender:gender || st.gender,
+                    age:age || st.age,
+                    grade:grade || st.grade 
+                })
+                .then(()=>{
+                    res.send("Update successifuly!")
+                })
+                .catch(err => console.log(err.message));
+            }))
+            
         }catch(error){
             res.send(error.message);
         }
@@ -64,17 +71,24 @@ const getOne = async(req,res) => {
     //Deleting a student
     const removeStudent = async(req,res) =>{
         try{
-            const _id = req.params.id;
-            await studentsSchema.deleteOne({_id});
-            res.send("Student deleted!");
+            const id = parseInt(req.params.id);
+            await students.findByPk(id)
+            .then((st) => {
+                if(!st){
+                    res.sendStatus(404);
+                }else{
+                    st.destroy({restartIdentity: false})
+                    .then(() => res.send("Student deleted!"))
+                }
+            });
         }catch(error){
-            res.sendStatus(404);
+            res.send(error.message);
         }
     }
     //removing all
 const deleteAll = async(req,res)=>{
     try{
-      await  subjectSchema.deleteMany()
+      await  students.truncate({restartIdentity: true})
         .then(() =>{
             res.send("Delecting all successifully")
         })
